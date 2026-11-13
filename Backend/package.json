@@ -1,0 +1,46 @@
+{
+  "dependencies": {
+    "@nestjs/common": "^12.4.2",
+    "@nestjs/config": "^12.1.1",
+    "@nestjs/core": "^12.4.2",
+    "@nestjs/jwt": "^12.0.4",
+    "@nestjs/passport": "^12.0.1",
+    "@nestjs/platform-express": "^12.4.2",
+    "@nestjs/typeorm": "^12.0.3",
+    "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.5.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.23.1",
+    "pusher": "^5.3.4",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^1.1.2"
+  },
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.12",
+    "@nestjs/schematics": "^12.0.13",
+    "@rspack/core": "^2.1.10",
+    "@types/bcrypt": "^6.0.0",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/passport-jwt": "^4.0.1",
+    "fork-ts-checker-webpack-plugin": "^9.1.0",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "typescript": "^6.0.3",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
