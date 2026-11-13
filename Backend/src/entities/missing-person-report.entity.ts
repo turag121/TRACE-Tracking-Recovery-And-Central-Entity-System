@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -34,6 +35,33 @@ export class MissingPersonReport {
     nullable: true,
   })
   description: string | null;
+
+  @Column({ type: 'integer', nullable: true })
+  age: number | null;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  gender: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  physicalDescription: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  photographPath: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  lastSeenLocation: string | null;
+
+  @Column({ type: 'date', nullable: true })
+  lastSeenDate: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  additionalInformation: string | null;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  contactPhone: string | null;
+
+  @Column({ type: 'varchar', length: 150, nullable: true })
+  contactEmail: string | null;
 
   @Column({
     type: 'enum',
@@ -68,4 +96,10 @@ export class MissingPersonReport {
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

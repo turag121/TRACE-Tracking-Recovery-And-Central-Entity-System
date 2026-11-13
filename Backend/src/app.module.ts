@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
+import { MprModule } from './missing_person_reporter/mpr.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { AdminModule } from './admin/admin.module';
       synchronize: true,
     }),
     AdminModule,
+    MprModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
