@@ -18,7 +18,7 @@ import { Notification } from '../entities/notification.entity';
 import { ReportAdditionalInfo } from '../entities/report-additional-info.entity';
 import { User, UserRole } from '../entities/user.entity';
 import { VolunteerAssignment } from '../entities/volunteer-assignment.entity';
-import { EmailVerificationPurpose } from '../entities/email-verification.entity';
+import { EmailVerificationPurpose, VerificationRole } from '../entities/email-verification.entity';
 import { EmailService } from '../email/email.service';
 import { AdditionalInfoDto } from './dto/additional-info.dto';
 import { CaseOfficerMessageDto } from './dto/case-officer-message.dto';
@@ -42,38 +42,107 @@ export class MprService {
     private readonly emailService: EmailService,
   ) {}
 
-  async register(dto: MprRegistrationDto) {
-    const duplicate = await this.userRepo.findOne({ where: [{ username: dto.username }, { email: dto.email }] });
-    if (duplicate) throw new ConflictException('Username or email already exists');
+  
+async register(dto: MprRegistrationDto) {
+  // Check username across ALL roles
+  const usernameExists = await this.userRepo.findOne({
+    where: { username: dto.username },
+  });
 
-    const user = this.userRepo.create({
-      name: dto.name,
-      username: dto.username,
-      email: dto.email,
-      password: await bcrypt.hash(dto.password, 10),
-      phone: dto.phone,
-      address: dto.address,
-      role: UserRole.MPR,
-      isActive: false,
-      isEmailVerified: false,
-    });
-    const saved = await this.userRepo.save(user);
-    try {
-      const verificationToken = await this.emailService.generateAndSendOtp(
-        saved.id,
-        EmailVerificationPurpose.REGISTRATION,
-      );
-      return {
-        message: 'Registration initiated. Please check your email for the OTP.',
-        email: saved.email,
-        verificationRequired: true,
-        verificationToken,
-      };
-    } catch (error) {
-      await this.userRepo.delete(saved.id);
-      throw error;
-    }
+  if (usernameExists) {
+    throw new ConflictException(
+      'This username is already registered. Please choose another username.',
+    );
   }
+
+  // Check email only for MPR role
+  const emailExists = await this.userRepo.findOne({
+    where: {
+      email: dto.email,
+      role: UserRole.MPR,
+    },
+  });
+
+  if (emailExists) {
+    throw new ConflictException(
+      'This email is already registered as an MPR account.',
+    );
+  }
+
+  const verificationToken = await this.emailService.startRegistration(
+    {
+      ...dto,
+      password: await bcrypt.hash(dto.password, 10),
+    },
+    VerificationRole.MPR,
+  );
+
+  return {
+    message: 'Registration initiated. Please check your email for the OTP.',
+    email: dto.email,
+    verificationRequired: true,
+    verificationToken,
+  };
+}
+
+
+async completeRegistration(verificationToken: string, otp: string) {
+  const record = await this.emailService.verifyRegistrationOtp(
+    verificationToken,
+    otp,
+    VerificationRole.MPR,
+  );
+
+  const data = record.verificationData;
+
+  if (!data) {
+    throw new BadRequestException('Registration data is missing');
+  }
+
+  // Username check across ALL roles
+  const usernameExists = await this.userRepo.findOne({
+    where: { username: data.username },
+  });
+
+  if (usernameExists) {
+    throw new ConflictException(
+      'This username is already registered. Please choose another username.',
+    );
+  }
+
+  // Email check only for MPR role
+  const emailExists = await this.userRepo.findOne({
+    where: {
+      email: data.email,
+      role: UserRole.MPR,
+    },
+  });
+
+  if (emailExists) {
+    throw new ConflictException(
+      'This email is already registered as an MPR account.',
+    );
+  }
+
+  const user = await this.userRepo.save(
+    this.userRepo.create({
+      ...data,
+      role: UserRole.MPR,
+      isEmailVerified: true,
+      isActive: true,
+    }),
+  );
+
+  await this.emailService.consumeRegistration(record.id);
+
+  await this.emailService.sendRegistrationConfirmationEmail(user.email);
+
+  return {
+    message: 'Your email has been verified. MPR registration completed successfully.',
+    registrationCompleted: true,
+  };
+}
+
 
   async login(dto: MprLoginDto) {
     const user = await this.userRepo.findOne({ where: { username: dto.username, role: UserRole.MPR } });

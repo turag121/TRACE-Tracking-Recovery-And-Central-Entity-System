@@ -26,6 +26,7 @@ import { FoundPersonDto } from './dto/found-person.dto';
 import { MprLoginDto } from './dto/mpr-login.dto';
 import { MprRegistrationDto } from './dto/mpr-registration.dto';
 import { CreateReportDto, UpdateReportDto } from './dto/report.dto';
+import { VerifyMprRegistrationDto } from './dto/verify-mpr-registration.dto';
 import { MprService } from './mpr.service';
 
 interface MprRequest extends Request {
@@ -47,6 +48,11 @@ export class MprController {
   @Post('login')
   login(@Body() dto: MprLoginDto) {
     return this.mprService.login(dto);
+  }
+
+  @Post('verify-registration')
+  verifyRegistration(@Body() dto: VerifyMprRegistrationDto) {
+    return this.mprService.completeRegistration(dto.verificationToken, dto.otp);
   }
 
   @UseGuards(JwtAuthGuard, MprGuard)

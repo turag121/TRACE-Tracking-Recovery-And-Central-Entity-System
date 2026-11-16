@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
 import { MprModule } from './missing_person_reporter/mpr.module';
 import { EmailModule } from './email/email.module';
+import { VolunteerModule } from './volunteer/volunteer.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { EmailModule } from './email/email.module';
     AdminModule,
     MprModule,
     EmailModule,
+    VolunteerModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
