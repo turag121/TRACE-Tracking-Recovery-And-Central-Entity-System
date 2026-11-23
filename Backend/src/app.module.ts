@@ -8,6 +8,7 @@ import { MprModule } from './missing_person_reporter/mpr.module';
 import { EmailModule } from './email/email.module';
 import { VolunteerModule } from './volunteer/volunteer.module';
 import { AuthModule } from './auth/auth.module';
+import { CaseOfficerModule } from './case_officer/case-officer.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuthModule } from './auth/auth.module';
     EmailModule,
     VolunteerModule,
     AuthModule,
+    CaseOfficerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
