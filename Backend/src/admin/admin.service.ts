@@ -90,6 +90,7 @@ export class AdminService {
       password: await bcrypt.hash(dto.password, 10),
       role: UserRole.CASE_OFFICER,
       isActive: true,
+      isEmailVerified: true,
     });
     const saved = await this.userRepo.save(user);
     await this.log('CASE_OFFICER_CREATED', `${saved.username} was created`, adminId);

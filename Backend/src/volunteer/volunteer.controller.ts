@@ -23,6 +23,7 @@ import { ChangeVolunteerPasswordDto } from './dto/change-volunteer-password.dto'
 import { SubmitVolunteerTipDto } from './dto/submit-volunteer-tip.dto';
 import { UpdateVolunteerAssignmentStatusDto } from './dto/update-volunteer-assignment-status.dto';
 import { UpdateVolunteerProfileDto } from './dto/update-volunteer-profile.dto';
+import { VolunteerLoginDto } from './dto/volunteer-login.dto';
 import { VerifyVolunteerRegistrationDto } from './dto/verify-volunteer-registration.dto';
 import { VolunteerRegistrationDto } from './dto/volunteer-registration.dto';
 import { VolunteerService } from './volunteer.service';
@@ -38,6 +39,11 @@ export class VolunteerController {
   @Post('register')
   register(@Body() dto: VolunteerRegistrationDto) {
     return this.volunteerService.register(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: VolunteerLoginDto) {
+    return this.volunteerService.login(dto);
   }
 
   @Post('verify-registration')

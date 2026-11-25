@@ -7,6 +7,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { EmailService } from '../email/email.service';
@@ -24,6 +25,7 @@ import { ChangeVolunteerPasswordDto } from './dto/change-volunteer-password.dto'
 import { SubmitVolunteerTipDto } from './dto/submit-volunteer-tip.dto';
 import { UpdateVolunteerAssignmentStatusDto } from './dto/update-volunteer-assignment-status.dto';
 import { UpdateVolunteerProfileDto } from './dto/update-volunteer-profile.dto';
+import { VolunteerLoginDto } from './dto/volunteer-login.dto';
 import { VolunteerRegistrationDto } from './dto/volunteer-registration.dto';
 
 @Injectable()
@@ -36,7 +38,37 @@ export class VolunteerService {
     @InjectRepository(InvestigationUpdate) private readonly updateRepo: Repository<InvestigationUpdate>,
     @InjectRepository(Notification) private readonly notificationRepo: Repository<Notification>,
     private readonly emailService: EmailService,
+    private readonly jwtService: JwtService,
   ) {}
+
+  async login(dto: VolunteerLoginDto) {
+    const user = await this.userRepo.findOne({
+      where: { username: dto.username, role: UserRole.VOLUNTEER },
+    });
+    if (
+      !user ||
+      user.role !== UserRole.VOLUNTEER ||
+      !user.isEmailVerified ||
+      !user.isActive ||
+      !(await bcrypt.compare(dto.password, user.password))
+    ) {
+      throw new UnauthorizedException('Invalid volunteer credentials');
+    }
+
+    return {
+      message: 'Volunteer login successful',
+      accessToken: this.jwtService.sign({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      }),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
 
   async register(dto: VolunteerRegistrationDto) {
     const duplicate = await this.userRepo.findOne({
